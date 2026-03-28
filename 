@@ -1,0 +1,60 @@
+[1mdiff --git a/frontend/src/pages/JobDetail.vue b/frontend/src/pages/JobDetail.vue[m
+[1mindex d8f80d18..5735f890 100644[m
+[1m--- a/frontend/src/pages/JobDetail.vue[m
+[1m+++ b/frontend/src/pages/JobDetail.vue[m
+[36m@@ -157,7 +157,7 @@[m [mimport {[m
+ 	createResource,[m
+ 	usePageMeta,[m
+ } from 'frappe-ui'[m
+[31m-import { inject, ref, computed } from 'vue'[m
+[32m+[m[32mimport { inject, ref, computed, watch, nextTick } from 'vue'[m
+ import { sessionStore } from '../stores/session'[m
+ import JobApplicationModal from '@/components/Modals/JobApplicationModal.vue'[m
+ import {[m
+[36m@@ -193,17 +193,11 @@[m [mconst job = createResource({[m
+ 	},[m
+ 	cache: ['job', props.job],[m
+ 	auto: true,[m
+[31m-	onSuccess: (data) => {[m
+[31m-		if (user.data?.name) {[m
+[31m-			jobApplication.submit()[m
+[31m-			applicationCount.submit()[m
+[31m-		}[m
+[31m-	},[m
+ })[m
+ [m
+ const jobApplication = createResource({[m
+ 	url: 'frappe.client.get_list',[m
+[31m-	makeParams(values) {[m
+[32m+[m	[32mmakeParams() {[m
+ 		return {[m
+ 			doctype: 'LMS Job Application',[m
+ 			filters: {[m
+[36m@@ -216,7 +210,7 @@[m [mconst jobApplication = createResource({[m
+ [m
+ const applicationCount = createResource({[m
+ 	url: 'frappe.client.get_count',[m
+[31m-	makeParams(values) {[m
+[32m+[m	[32mmakeParams() {[m
+ 		return {[m
+ 			doctype: 'LMS Job Application',[m
+ 			filters: {[m
+[36m@@ -226,6 +220,18 @@[m [mconst applicationCount = createResource({[m
+ 	},[m
+ })[m
+ [m
+[32m+[m[32mconst stopWatch = watch([m
+[32m+[m	[32m() => [job.data?.name, user.data?.name],[m
+[32m+[m	[32m([jobName, userName]) => {[m
+[32m+[m		[32mif (jobName && userName) {[m
+[32m+[m			[32mjobApplication.submit()[m
+[32m+[m			[32mapplicationCount.submit()[m
+[32m+[m			[32mnextTick(() => stopWatch())[m
+[32m+[m		[32m}[m
+[32m+[m	[32m},[m
+[32m+[m	[32m{ immediate: true }[m
+[32m+[m[32m)[m
+[32m+[m
+ const openApplicationModal = () => {[m
+ 	showApplicationModal.value = true[m
+ }[m
